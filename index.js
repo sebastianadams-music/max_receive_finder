@@ -20,6 +20,28 @@ function handleFile() {
     reader.readAsText(file, 'utf-8');
   }
 
+  function handlePatchers() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+
+    if (!file) {
+      alert('No file selected');
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+      const jsonData = event.target.result;
+      const data = JSON.parse(jsonData);
+
+      const instances = findTextStartingWithP(data);
+      displayResults(instances);
+    };
+
+    reader.readAsText(file, 'utf-8');
+  }
+
   function findTextStartingWithR(data) {
     const results = [];
 
@@ -39,6 +61,25 @@ function handleFile() {
         else if (key === 'text' && typeof obj[key] === 'string' && obj[key].startsWith('r~ ')) {
             results.push(obj[key]);
           }
+      }
+    }
+
+    traverse(data);
+
+    return results;
+  } 
+
+  function findTextStartingWithP(data) {
+    const results = [];
+
+    function traverse(obj) {
+      for (const key in obj) {
+        if (typeof obj[key] === 'object') {
+          traverse(obj[key]);
+        } else if (key === 'text' && typeof obj[key] === 'string' && obj[key].startsWith('p ')) {
+          results.push(obj[key]);
+        }
+       
       }
     }
 
